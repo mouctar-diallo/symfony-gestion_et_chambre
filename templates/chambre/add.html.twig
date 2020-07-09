@@ -1,0 +1,13 @@
+{% extends 'layouts/base.html.twig'%}
+
+{% block body %}
+    <div class="card-header">
+        <h2 class="text-center mt-4">Ajouter une Chambre</h2>
+    </div>
+    <div class="align-items-center justify-content-center d-flex mt-4">
+        {{ form_start(form_add_chambre) }}
+            {{ form_widget(form_add_chambre) }}
+            <input type="submit" value="enregister" class="btn btn-primary btn-block" name="enregistrer" formnovalidate>
+        {{ form_end(form_add_chambre) }}
+    </div>
+{% endblock %}

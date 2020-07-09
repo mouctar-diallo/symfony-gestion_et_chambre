@@ -1,0 +1,199 @@
+{% extends 'layouts/base.html.twig'%}
+
+{% block body %}
+    <div class="card-header">
+        <h2 class="text-center mt-2">Liste des Etudiants</h2>
+    </div>
+    <table class="table table-stripped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="bg-primary text-white">matricule</th>
+                <th class="bg-primary text-white">prenom</th>
+                <th class="bg-primary text-white">email</th>
+                <th class="bg-primary text-white">type</th>
+                <th class="bg-primary text-white">adresse</th>
+                <th class="bg-primary text-white">bourse</th>
+                <th class="bg-primary text-white">action</th>
+            </tr>
+        </thead>
+        <tbody id="etudiants">
+
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+<script>
+$(document).ready(function(){
+    //on cible le tr cliqué
+    $('#etudiants').on('click','.etudiant_tr',function(){
+        tr_etudiant = $(this);
+    });
+//suppression etudiant
+$("#etudiants").on('click','.delete',function(event,tr_etudiant){
+    event.preventDefault();
+        swal({
+            title: "Êtes-vous sûr?",
+            text: "vous pouvez annuler la suppresion en cliquant sur cancel",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+        if (willDelete) {
+            vers_etudiant_delete = $(this).data('url');
+            id = $(this).data('id');
+        $.ajax({
+            url : vers_etudiant_delete,
+            type: 'POST',
+            data : {
+                'id': id
+            },
+            success: function(response){  
+                if (response=="deleted") {
+                    swal({
+                        title: "Good job !",
+                        text: "suppression réussi",
+                        icon: "success",
+                        button: "OK",
+                    });
+                    tr_etudiant.hide( 300, function() {
+                        $( this ).remove();
+                    });
+                }
+            }
+        });
+    } else {
+        swal("vous avez annulé la suppression");
+}
+    return false;
+})
+})
+    //end suppression**************************
+
+    tbody = $('#etudiants');
+    loadEtudiant();
+    function loadEtudiant(){
+        $.ajax({
+            url : "{{path('list_etudiant')}}",
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data){
+                tbody.html('')
+                addData(data,tbody);
+            }
+        })
+    }
+    //get data student
+    $("#list_student").on('click',function(event){
+        event.preventDefault();
+        loadEtudiant()
+    })
+
+    //affiche data etudiant
+    function addData(etudiant,tbody){
+       for(i = 0; i < etudiant.length; i++){
+           id = etudiant[i].id;
+            tbody.append(`
+            <tr class="etudiant_tr">
+                <td data-info="text-matricule-${etudiant[i].id}">${etudiant[i].matricule}</td>
+                <td data-info="text-prenom-${etudiant[i].id}">${etudiant[i].prenom}</td>
+                <td data-info="text-email-${etudiant[i].id}">${etudiant[i].email}</td>
+                <td data-info="text-type-${etudiant[i].id}">${etudiant[i].type}</td>
+                <td data-info="text-adresse-${etudiant[i].id}">${etudiant[i].adresse}</td>
+                <td data-info="text-bourse-${etudiant[i].id}">${etudiant[i].bourse}</td>
+                <td class="text-center">
+                    <a class="delete" data-url="{{ path('delete_etudiant') }}" data-id="${etudiant[i].id}"><i class="btn btn-danger fa fa-trash " aria-hidden="true" title="delete"></i></a>
+                </td>
+            </tr>
+        `);
+     };
+    }
+})  
+//end****************************
+
+
+//UPDATE STUDENT
+    let clone;
+    let type;
+    let cpt = 0;
+    // 
+    $("#etudiants")
+    .on("click","tr",function(){
+        if(cpt==0) swal("pour modifier veuillez double cliquez !");
+        cpt = 1
+    })
+
+    .on('dblclick',"td",function(){
+        const info_tr = $(this).attr("data-info");
+
+        const tab = info_tr.split("-");
+        //gardons l'element le td cliqué dans clone
+        type=tab[0];
+        if(type==="text"){
+            clone = $(this).text();
+            const input=generateInput(tab,clone);
+            $(this).html(input);
+            $(this).children().focus();
+        }
+    })
+    .on("focusout","td",function(e){
+        const {value,id} = e.target
+        const tab=id.split("-");
+        if(type==='text') {
+            if(value.trim() != "" && value.trim() != clone){
+                if(tab[0]==='email' && !isEmail(value)) {
+                    swal({
+                        title: "l'adresse email n'est pas valide",
+                        text: "exemple email valide : exemple@gmail.com",
+                        buttons: true,
+                    })
+                    return false;
+                }
+                $(this).html(value); 
+                
+                $.ajax({
+                    method:"POST",
+                    url: "{{ path('edit_etudiant')}}",
+                    data:{
+                        id: tab[1],
+                        cible: tab[0],
+                        valeur: value
+                    }
+                })
+                .done(data =>{
+                    if (data=="updated") {
+                        swal({
+                            title: "Good job !",
+                            text: "modification réussi",
+                            icon: "success",
+                            button: "OK",
+                        });
+                    }
+                })
+            }
+            else{
+                $(this).html(clone);
+            } 
+        }
+        setTimeout( 
+            function() {
+            window.location.reload(true);
+            }, 2000);
+        
+        })
+
+
+//GENERE UN INPUT
+function generateInput(tab,txt){
+    const input = `<input type ="${tab[0]}" id="${tab[1]}-${tab[2]}" value="${txt}"/>`;
+    return input;
+}
+//TESTE SI EMAIL EST VALIDE
+function isEmail(email) {
+    var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    return regex.test(email);
+}
+</script>
+{% endblock %}

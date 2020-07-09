@@ -1,0 +1,82 @@
+{% extends 'layouts/base.html.twig'%}
+
+{% block body %}
+    <div class="card-header">
+        <h2 class="text-center mt-2">Liste des Chambre</h2>
+    </div>
+    <table class="table table-stripped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="bg-primary text-white">#</th>
+                <th class="bg-primary text-white">numero</th>
+                <th class="bg-primary text-white">type</th>
+                <th class="bg-primary text-white">numero batiment</th>
+                <th class="bg-primary text-white">action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for chambre in chambres %}
+                <tr class="chambre">
+                    <td class="text-center">{{chambre.id}}</td>
+                    <td class="text-center">{{chambre.numero}}</td>
+                    <td class="text-center">{{chambre.type}}</td>
+                    <td class="text-center">{{chambre.numeroBatiment}}</td>
+                    <td class="text-center">
+                        <a href="{{ path('chambre_edit',{'id':chambre.id}) }}"><i class="btn btn-primary fa fa-pencil-square-o" aria-hidden="true" title="edit"></i></a>
+                        <a class="delete" data-url= "{{ path('chambre_delete',{'id':chambre.id}) }}"><i class="btn btn-danger fa fa-trash " aria-hidden="true" title="delete"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {{knp_pagination_render(chambres)}}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+<script>
+$(document).ready(function(){
+    //on cible le tr cliqué
+$('.chambre').click(function(){
+    tr_chambre = $(this);
+});
+    
+$('.delete').on('click',function(event,tr_chambre){
+    event.preventDefault();
+    swal({
+        title: "Êtes-vous sûr?",
+        text: "vous pouvez annuler la suppresion en cliquant sur cancel",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+        })
+    .then((willDelete) => {
+    if (willDelete) {
+        //recupere la roure et l'id de la ligne asupprimer
+        vers_chambre_delete = $(this).data('url');
+        $.ajax({
+            url : vers_chambre_delete,
+            type: 'POST',
+            success: function(response){  
+                if (response=="deleted") {
+                    swal({
+                        title: "Good job !",
+                        text: "suppression réussi",
+                        icon: "success",
+                        button: "OK",
+                    });
+                    tr_chambre.hide( 2000, function() {
+                        $(this).parent().remove();
+                    });
+                }
+            }
+        });
+    } else {
+        swal("vous avez annulé la suppression");
+    }
+    });
+})
+}) 
+    
+</script>
+{% endblock %}

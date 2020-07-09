@@ -1,0 +1,56 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block body %}
+<div class="col">
+    <div class="card-header">
+        <h2 class="text-center mt-5">Connectez-Vous</h2>
+    </div>
+    <div class="align-items-center justify-content-center d-flex mt-2">
+        <form method="POST">
+            <input type="hidden" name="crsf_token" value="{{ csrf_token('loginform') }}">
+            <div>
+                <label for="type" class="control-label w-100">email</label>
+               <div id="error-email" class="d-none">
+                <span class='form-error-icon badge badge-danger text-uppercase'>Error</span>
+                <span class='form-error-message text-danger'>entrer l'adresse email</span>
+               </div>
+                <input type="email" name="email" class="form-control" value="{{ app.session.get('email_user')}}" id="email">
+                <small class="alert-danger text-danger" id="error-type"></small>
+            </div>
+            <div>
+                <label for="password" class="control-label w-100">password</label>
+                <div id="error-password" class="d-none">
+                    <span class='form-error-icon badge badge-danger text-uppercase'>Error</span>
+                    <span class='form-error-message text-danger'>entrer votre mot de passe</span>
+                   </div>
+                <input type="password" name="password" class="form-control" id="password">
+                <small class="alert-danger text-danger" id="error-password"></small>
+            </div>
+            <div>
+                <label for="remembre_me">
+                    <input type="checkbox" name="_remembre_me" id="remembre_me">
+                    se souvenir de moi
+                </label>
+            </div>
+            <input type="submit" value="enregistrer" name="enregistrer" class="btn btn-primary mt-2 btn-block" id="btn-connexion">
+        </form>
+    </div>
+</div>
+{% endblock body %}
+
+{% block javascripts %}
+    <script>
+        $('#btn-connexion').click(function(e){
+            var email = $('#email').val();
+            var password = $('#password').val();
+            if (email == "") {
+                $('#error-email').removeClass('d-none');
+                e.preventDefault();
+            }
+            if (password == "") {
+                $('#error-password').removeClass('d-none');
+                e.preventDefault();
+            }
+        })
+    </script>
+{% endblock %}

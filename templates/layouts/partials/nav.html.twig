@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-primary">
+    <a class="navbar-brand  text-white" href="{{ path('home_page') }}">ODC</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  
+    <div class="collapse navbar-collapse" id="navbarColor03">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item dropdown">
+          {% if app.user %}
+            <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Gestion Chambres
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ path('add_chambre') }}">Ajouter Chambre</a>
+              <a class="dropdown-item" href="{{ path('list_chambre') }}">Lister Chambre</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Gestion Etudiants
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ path('add_etudiant') }}">Ajouter Etudiant</a>
+              <a id="list_student" class="dropdown-item" href="{{ path('list_etudiant') }}">Lister Etudiant</a>
+        </li>
+      </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item dropdown mr-4">
+              <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {{ app.user.nom }}
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{{ path('logout') }}">logout</a>
+            </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{{ path('login_page')}}">se connecter</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{{ path('register_page')}}">s'inscrire</a>
+                </li>
+            {% endif %}
+      </ul>
+    </div>
+  </nav>
